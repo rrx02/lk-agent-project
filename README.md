@@ -1,16 +1,19 @@
 # LinkedIn Profile Hook Analyzer (Chrome Extension)
 
-A Chrome extension for recruiters who want to analyze a LinkedIn profile and identify profile-specific hooks for a personalized first message.
+A Chrome extension for recruiters who want to analyze a LinkedIn profile and identify concrete, human conversation hooks for a personalized first message.
 
 This project is only for hook analysis. It reads visible information from the current LinkedIn profile tab and helps the recruiter choose useful outreach angles.
 
 The extension helps you:
 
-- capture the profile name, URL, headline, and location from the current LinkedIn profile;
-- surface possible personalization hooks from visible profile text, including experience, skills, certifications, cloud keywords, and profile activity clues;
-- remind the recruiter to manually inspect the profile photo and banner for respectful, specific visual hooks such as a city skyline, conference stage, sport, award, pet, or other memorable detail;
-- generate an editable outreach example asking whether the person is open to a new role similar to their current title;
-- copy the suggested hooks or message without creating any local database.
+- capture the profile name, URL, headline, current company and location from the current LinkedIn profile;
+- turn the title into a simple opener, for example: “vi que és Fullstack Developer na empresa X — como tem sido aí?”;
+- show profile photo and banner previews so the recruiter can spot a city, technology banner, cloud/certification graphic, event, sport, pet or funny detail;
+- summarize useful About/profile text and suggest how to use it naturally;
+- summarize technical skills that appear on the profile and suggest choosing one or two to start the conversation;
+- detect cloud/certification signals and suggest asking how those certifications connect to the person's current work;
+- detect repeated public activity themes, such as Azure, AI or cloud, and suggest exploring whether those topics are genuine interests;
+- generate an editable outreach example asking whether the person is open to something new near their current role.
 
 > Important: the extension only reads information visible in the current browser tab. It does not use AI image recognition, does not bypass LinkedIn access controls, does not track outreach, and does not send data to an external server.
 
@@ -32,23 +35,45 @@ The extension helps you:
 1. Open a LinkedIn profile page, for example `https://www.linkedin.com/in/...`.
 2. Click the extension icon.
 3. Click **Analyze profile**.
-4. Review the generated **Suggested hooks**.
-5. Look at the profile photo and banner yourself, then write any useful visual detail in **Manual visual hook**.
+4. Review the generated **Conversation hooks**.
+5. Look at the profile photo and banner previews, then write any useful visual detail in **Manual photo/banner hook**.
 6. Edit the generated outreach example so it sounds natural.
 7. Click **Copy hooks** or **Copy message**.
+
+---
+
+## Example hooks
+
+```text
+Título atual
+Vejo que é Fullstack Developer na Acme.
+Dica: “Vejo que és Fullstack na Acme. Como está a correr aí? Estás aberto/a a ouvir algo novo?”
+
+Banner
+O banner parece ter várias tecnologias/cloud logos.
+Dica: “Vi várias tecnologias no teu banner — quais são as que mais usas hoje?”
+
+Skills técnicas
+Aparecem várias skills técnicas: React, Node.js, AWS, Terraform.
+Dica: escolhe 1 ou 2 destas skills e pergunta se tem trabalhado mais nisso no dia a dia.
+
+Publicações / interesses
+A atividade visível sugere interesse em Azure e AI.
+Dica: “Vi que tens interagido com temas de Azure/AI. É uma área que gostas mesmo de explorar?”
+```
 
 ---
 
 ## Example outreach message
 
 ```text
-Hi Maria,
+Olá Maria,
 
-I came across your LinkedIn profile. I noticed your AWS certification and current Senior DevOps Engineer role. I also noticed the Lisbon skyline in your banner, which made your profile stand out.
+Reparei que és Fullstack Developer na Acme e gostava de perceber como está a ser essa experiência. Também achei interessante o teu banner com várias tecnologias cloud.
 
-Your background looks relevant to a new position similar to your current role. Would you be open to a short conversation so I can share the opportunity and see if it matches what you want next?
+Como tem sido essa experiência na Acme? Estás aberto/a a ouvir algo novo, numa oportunidade próxima do que já fazes hoje?
 
-Best,
+Obrigado,
 ```
 
 ---
