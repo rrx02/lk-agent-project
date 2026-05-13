@@ -1,265 +1,190 @@
- (cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF' 
-diff --git a/linkedin-contact-tracker/popup.css b/linkedin-contact-tracker/popup.css
-index a69db4448a10d844f16ebef2bf4bc964d8251344..1508dd01d24eb3d5ec7b1065f75c0e0359a8f99f 100644
---- a/linkedin-contact-tracker/popup.css
-+++ b/linkedin-contact-tracker/popup.css
-@@ -1,152 +1,245 @@
- :root {
-   color-scheme: light;
-   font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
- }
- 
- body {
-   margin: 0;
--  min-width: 420px;
-+  min-width: 460px;
-+  max-width: 460px;
-   background: #f4f6fb;
-   color: #1f2937;
- }
- 
- .app {
-   padding: 14px;
- }
- 
--h1 {
--  font-size: 1.1rem;
--  margin: 0 0 10px;
-+.hero {
-+  background: linear-gradient(135deg, #0a66c2, #1d4ed8);
-+  color: white;
-+  border-radius: 14px;
-+  padding: 14px;
-+  margin-bottom: 12px;
-+}
-+
-+.hero h1,
-+.hero p {
-+  margin: 0;
-+}
-+
-+.hero h1 {
-+  font-size: 1.2rem;
-+  margin-bottom: 6px;
-+}
-+
-+.hero p:not(.eyebrow) {
-+  font-size: 0.84rem;
-+  opacity: 0.92;
-+}
-+
-+.eyebrow {
-+  font-size: 0.7rem;
-+  letter-spacing: 0.08em;
-+  margin-bottom: 5px;
-+  opacity: 0.8;
-+  text-transform: uppercase;
- }
- 
- h2 {
-   font-size: 0.95rem;
-   margin: 0 0 10px;
- }
- 
- .card {
-   background: #fff;
-   border: 1px solid #e5e7eb;
--  border-radius: 10px;
-+  border-radius: 12px;
-   padding: 12px;
-   margin-bottom: 12px;
-+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
- }
- 
- form {
-   display: grid;
--  gap: 8px;
-+  gap: 9px;
- }
- 
- label {
-   display: grid;
-   gap: 4px;
-   font-size: 0.82rem;
-   color: #4b5563;
-+  font-weight: 600;
- }
- 
- input,
- select,
-+textarea,
- button {
-   border-radius: 8px;
-   border: 1px solid #cbd5e1;
-   padding: 8px;
-+  font: inherit;
-   font-size: 0.86rem;
- }
- 
-+textarea {
-+  min-height: 48px;
-+  resize: vertical;
-+}
-+
- button {
-   background: #2563eb;
-   border-color: #1d4ed8;
-   color: white;
-   cursor: pointer;
-+  font-weight: 700;
-+}
-+
-+button:hover {
-+  filter: brightness(0.97);
- }
- 
- button.secondary {
-   background: white;
-   color: #1d4ed8;
- }
- 
- button.remove {
-   background: #ef4444;
-   border-color: #dc2626;
- }
- 
- button.mark-contacted {
-   background: #059669;
-   border-color: #047857;
- }
- 
- .form-actions {
-   display: flex;
-+  flex-wrap: wrap;
-   gap: 8px;
- }
- 
-+.status-message {
-+  color: #475569;
-+  font-size: 0.78rem;
-+  margin: 8px 0 0;
-+}
-+
- .metrics {
-   display: grid;
-   grid-template-columns: repeat(2, minmax(0, 1fr));
-   gap: 8px;
- }
- 
- .metric {
-   border: 1px solid #e5e7eb;
-   border-radius: 8px;
-   padding: 8px;
-   background: #f9fafb;
- }
- 
- .metric strong {
-   display: block;
-   font-size: 1rem;
- }
- 
-+.metric span {
-+  color: #64748b;
-+  font-size: 0.75rem;
-+}
-+
- .hint {
-   margin: 0 0 8px;
-   color: #6b7280;
-   font-size: 0.78rem;
-+  line-height: 1.35;
- }
- 
-+.insights,
- .contacts {
-   display: grid;
-   gap: 8px;
- }
- 
-+.insight {
-+  background: #f8fafc;
-+  border: 1px solid #dbeafe;
-+  color: #1e3a8a;
-+  text-align: left;
-+  line-height: 1.35;
-+  font-weight: 600;
-+}
-+
-+.insight.visual {
-+  color: #334155;
-+  display: grid;
-+  gap: 4px;
-+  font-size: 0.8rem;
-+  padding: 9px;
-+}
-+
-+.insight.visual span {
-+  font-weight: 400;
-+}
-+
- .contact-item {
-   border: 1px solid #e5e7eb;
--  border-radius: 8px;
--  padding: 8px;
-+  border-radius: 10px;
-+  padding: 9px;
-   background: #fafafa;
- }
- 
- .contact-main {
-   display: flex;
-   justify-content: space-between;
-   align-items: baseline;
--  margin-bottom: 8px;
-+  margin-bottom: 5px;
-   gap: 8px;
- }
- 
- .contact-name {
-   color: #1d4ed8;
-   text-decoration: none;
--  font-weight: 600;
-+  font-weight: 700;
-+}
-+
-+.contact-headline,
-+.contact-notes {
-+  margin: 0 0 6px;
-+  color: #475569;
-+  font-size: 0.78rem;
-+  line-height: 1.35;
-+}
-+
-+.contact-notes {
-+  color: #64748b;
- }
- 
- .created-at {
-   color: #6b7280;
-   font-size: 0.75rem;
-+  white-space: nowrap;
- }
- 
- .contact-controls {
-   display: grid;
--  grid-template-columns: 1fr auto auto;
-+  grid-template-columns: 1fr auto auto auto;
-   gap: 8px;
-   align-items: center;
- }
- 
- .empty-state {
-   text-align: center;
-   color: #6b7280;
-   font-size: 0.85rem;
-   padding: 10px;
-   border: 1px dashed #cbd5e1;
-   border-radius: 8px;
- }
-+
-+.hidden {
-+  display: none;
-+}
- 
-EOF
-)
+:root {
+  color-scheme: light;
+  font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+body {
+  margin: 0;
+  min-width: 460px;
+  max-width: 460px;
+  background: #f4f6fb;
+  color: #1f2937;
+}
+
+.app {
+  padding: 14px;
+}
+
+.hero {
+  background: linear-gradient(135deg, #0a66c2, #1d4ed8);
+  color: white;
+  border-radius: 14px;
+  padding: 14px;
+  margin-bottom: 12px;
+}
+
+.hero h1,
+.hero p {
+  margin: 0;
+}
+
+.hero h1 {
+  font-size: 1.2rem;
+  margin-bottom: 6px;
+}
+
+.hero p:not(.eyebrow) {
+  font-size: 0.84rem;
+  opacity: 0.92;
+}
+
+.eyebrow {
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  margin-bottom: 5px;
+  opacity: 0.8;
+  text-transform: uppercase;
+}
+
+h2 {
+  font-size: 0.95rem;
+  margin: 0 0 10px;
+}
+
+.card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 12px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.summary-grid {
+  display: grid;
+  gap: 9px;
+}
+
+label {
+  display: grid;
+  gap: 4px;
+  font-size: 0.82rem;
+  color: #4b5563;
+  font-weight: 600;
+}
+
+input,
+textarea,
+button {
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  padding: 8px;
+  font: inherit;
+  font-size: 0.86rem;
+}
+
+textarea {
+  box-sizing: border-box;
+  min-height: 60px;
+  resize: vertical;
+  width: 100%;
+}
+
+button {
+  background: #2563eb;
+  border-color: #1d4ed8;
+  color: white;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+button:hover {
+  filter: brightness(0.97);
+}
+
+button.secondary {
+  background: white;
+  color: #1d4ed8;
+}
+
+button.compact {
+  padding: 6px 8px;
+  font-size: 0.78rem;
+}
+
+.form-actions,
+.section-heading {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.section-heading {
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.section-heading h2 {
+  margin: 0;
+}
+
+.status-message {
+  color: #475569;
+  font-size: 0.78rem;
+  margin: 8px 0 0;
+}
+
+.hint {
+  margin: 0 0 8px;
+  color: #6b7280;
+  font-size: 0.78rem;
+  line-height: 1.35;
+}
+
+.hooks {
+  display: grid;
+  gap: 8px;
+}
+
+.hook-card {
+  background: #f8fafc;
+  border: 1px solid #dbeafe;
+  border-radius: 10px;
+  color: #1e3a8a;
+  display: grid;
+  gap: 5px;
+  padding: 9px;
+}
+
+.hook-card p {
+  color: #334155;
+  font-size: 0.82rem;
+  line-height: 1.35;
+  margin: 0;
+}
+
+.hook-card small {
+  color: #64748b;
+  font-size: 0.75rem;
+  line-height: 1.35;
+}
+
+.hook-card.visual {
+  border-color: #fde68a;
+  background: #fffbeb;
+  color: #92400e;
+}
+
+.empty-state {
+  text-align: center;
+  color: #6b7280;
+  font-size: 0.85rem;
+  padding: 10px;
+  border: 1px dashed #cbd5e1;
+  border-radius: 8px;
+}
+
+.hidden {
+  display: none;
+}
