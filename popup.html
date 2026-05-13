@@ -11,12 +11,12 @@
       <header class="hero">
         <p class="eyebrow">LinkedIn hook analysis</p>
         <h1>Profile Hook Analyzer</h1>
-        <p>Transform profile details into concrete, human outreach hooks.</p>
+        <p>Turn profile details into accurate, playful outreach hooks.</p>
       </header>
 
       <section class="card">
         <h2>Analyze current LinkedIn profile</h2>
-        <p class="hint">Open a LinkedIn profile, click analyze, then review concrete hooks for title/company, photo, banner, about, skills, certifications and activity themes.</p>
+        <p class="hint">Open a LinkedIn profile, click analyze, then choose one hook. The draft rewrites around that hook instead of stacking multiple ideas.</p>
         <div class="form-actions">
           <button id="analyzeProfile" type="button">Analyze profile</button>
           <button id="prefillCurrent" type="button" class="secondary">Use current tab link</button>
@@ -38,11 +38,6 @@
           </label>
 
           <label>
-            Location
-            <input id="profileLocation" type="text" placeholder="Ex.: Lisbon, Portugal" />
-          </label>
-
-          <label>
             LinkedIn URL
             <input id="linkedinUrl" type="url" placeholder="https://www.linkedin.com/in/..." />
           </label>
@@ -50,9 +45,9 @@
       </section>
 
       <section class="card">
-        <h2>Manual photo/banner hook</h2>
-        <p class="hint">Check the image previews below: mention a city, technology banner, certification graphic, event, sport or funny detail only if it feels natural.</p>
-        <textarea id="visualNote" rows="3" placeholder="Ex.: a foto parece numa cidade fixe; o banner mostra várias tecnologias; aparece uma certificação cloud; está num evento..."></textarea>
+        <h2>Photo or banner comment</h2>
+        <p class="hint">Check the image previews below. Add what you actually see in the photo or banner; the draft will include it as a light, informal opener.</p>
+        <textarea id="visualNote" rows="3" placeholder="Ex.: the banner looks like a city skyline; the photo looks like a conference stage; the banner has cloud logos..."></textarea>
       </section>
 
       <section id="hooksCard" class="card hidden">
@@ -65,7 +60,7 @@
 
       <section class="card">
         <div class="section-heading">
-          <h2>Mensagem exemplo</h2>
+          <h2>Message draft</h2>
           <button id="copyMessage" type="button" class="secondary compact">Copy message</button>
         </div>
         <textarea id="outreachMessage" rows="8" placeholder="Analyze a profile to generate a message example..."></textarea>
