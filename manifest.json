@@ -1,29 +1,19 @@
-  (cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF' 
-diff --git a/linkedin-profile-hook-analyzer/manifest.json b/linkedin-profile-hook-analyzer/manifest.json
-new file mode 100644
-index 0000000000000000000000000000000000000000..d126b896b57d4eb6c463f5987052e59c44068f8c
---- /dev/null
-+++ b/linkedin-profile-hook-analyzer/manifest.json
-@@ -0,0 +1,19 @@
-+{
-+  "manifest_version": 3,
-+  "name": "LinkedIn Profile Hook Analyzer",
-+  "description": "Analyses visible LinkedIn profile details and suggests personalized outreach hooks.",
-+  "version": "1.0.0",
-+  "permissions": ["tabs", "activeTab", "scripting"],
-+  "host_permissions": ["https://*.linkedin.com/*"],
-+  "action": {
-+    "default_title": "LinkedIn Profile Hook Analyzer",
-+    "default_popup": "popup.html"
-+  },
-+  "content_scripts": [
-+    {
-+      "matches": ["https://*.linkedin.com/in/*"],
-+      "js": ["content.js"],
-+      "run_at": "document_idle"
-+    }
-+  ]
-+}
- 
-EOF
-)
+{
+  "manifest_version": 3,
+  "name": "LinkedIn Profile Hook Analyzer",
+  "description": "Analyses visible LinkedIn profile details and suggests personalized outreach hooks.",
+  "version": "1.0.0",
+  "permissions": ["tabs", "activeTab", "scripting"],
+  "host_permissions": ["https://*.linkedin.com/*"],
+  "action": {
+    "default_title": "LinkedIn Profile Hook Analyzer",
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://*.linkedin.com/in/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
