@@ -1,6 +1,26 @@
+const ROLE_FAMILIES = {
+  SOFTWARE: 'software',
+  DATA: 'data',
+  CLOUD: 'cloud',
+  PRODUCT: 'product',
+  RECRUITING: 'recruiting',
+  DESIGN: 'design',
+  LEADERSHIP: 'leadership',
+  GENERAL: 'general'
+};
+
+const FAMILY_SKILL_HINTS = {
+  [ROLE_FAMILIES.SOFTWARE]: ['JavaScript', 'TypeScript', 'React', 'Angular', 'Vue', 'Node.js', 'Java', 'Python', 'C#', '.NET', 'SQL', 'API', 'Microservices'],
+  [ROLE_FAMILIES.DATA]: ['Python', 'SQL', 'Spark', 'Databricks', 'Snowflake', 'Machine Learning', 'AI', 'LLM', 'Analytics'],
+  [ROLE_FAMILIES.CLOUD]: ['AWS', 'Azure', 'GCP', 'Docker', 'Kubernetes', 'Terraform', 'CI/CD', 'DevOps', 'Cloud'],
+  [ROLE_FAMILIES.PRODUCT]: ['Product', 'Roadmap', 'Discovery', 'Analytics', 'Stakeholders', 'Strategy'],
+  [ROLE_FAMILIES.RECRUITING]: ['Recruiting', 'Talent Acquisition', 'Sourcing', 'Stakeholder Management', 'Employer Branding'],
+  [ROLE_FAMILIES.DESIGN]: ['UX', 'UI', 'Research', 'Figma', 'Design Systems'],
+  [ROLE_FAMILIES.LEADERSHIP]: ['Leadership', 'Strategy', 'Team Management', 'Delivery', 'Stakeholders']
+};
+
 const nameInput = document.getElementById('name');
 const headlineInput = document.getElementById('headline');
-const locationInput = document.getElementById('profileLocation');
 const linkedinUrlInput = document.getElementById('linkedinUrl');
 const visualNoteInput = document.getElementById('visualNote');
 const outreachMessageInput = document.getElementById('outreachMessage');
@@ -14,6 +34,7 @@ const hooksContainer = document.getElementById('hooks');
 
 let currentProfile = null;
 let currentHooks = [];
+let selectedHook = null;
 
 init();
 
@@ -37,7 +58,7 @@ async function analyzeCurrentProfile() {
   try {
     const profile = await requestProfileExtraction(activeTab.id);
     populateProfile(profile);
-    setStatus('Profile analyzed. Review the concrete conversation hooks and add a manual photo/banner observation if useful.');
+    setStatus('Profile analyzed. Pick one hook to rewrite the message around it. Add a photo/banner note if you see something fun.');
   } catch (error) {
     setStatus(`Could not analyze this page: ${error.message}`);
   }
@@ -53,16 +74,27 @@ async function requestProfileExtraction(tabId) {
 }
 
 function populateProfile(profile) {
-  currentProfile = profile;
-  currentHooks = buildHooks(profile);
+  currentProfile = normalizeProfile(profile);
+  currentHooks = buildHooks(currentProfile);
+  selectedHook = currentHooks[0] || null;
 
-  nameInput.value = profile.name || nameInput.value;
-  headlineInput.value = profile.headline || headlineInput.value;
-  locationInput.value = profile.location || locationInput.value;
-  linkedinUrlInput.value = profile.url || linkedinUrlInput.value;
+  nameInput.value = currentProfile.name || nameInput.value;
+  headlineInput.value = currentProfile.headline || headlineInput.value;
+  linkedinUrlInput.value = currentProfile.url || linkedinUrlInput.value;
 
-  renderHooks(currentHooks, profile);
-  outreachMessageInput.value = buildOutreachMessage(profile, currentHooks, visualNoteInput.value.trim());
+  renderHooks(currentHooks, currentProfile);
+  refreshMessageFromInputs();
+}
+
+function normalizeProfile(profile) {
+  const headline = profile.headline || '';
+  const roleFamily = getRoleFamily(headline);
+  return {
+    ...profile,
+    roleFamily,
+    roleCategory: profile.roleCategory || simplifyRole(headline),
+    currentCompany: profile.currentCompany || findCompanyFromHeadline(headline)
+  };
 }
 
 function buildHooks(profile) {
@@ -70,83 +102,98 @@ function buildHooks(profile) {
   const roleLabel = profile.roleCategory || simplifyRole(profile.headline);
   const company = profile.currentCompany;
 
-  if (roleLabel || company) {
+  if (roleLabel || company || profile.headline) {
     addHook(hooks, {
-      type: 'Título atual',
-      observation: `Vejo que é ${roleLabel || 'profissional'}${company ? ` na ${company}` : ''}.`,
-      suggestion: `Mensagem simples: “Vejo que és ${roleLabel || 'especialista'}${company ? ` na ${company}` : ''}. Como está a correr aí? Estás aberto/a a ouvir algo novo?”`,
-      messageLine: `és ${roleLabel || 'especialista'}${company ? ` na ${company}` : ''} e gostava de perceber como está a ser essa experiência`
+      id: 'title',
+      type: 'Current title',
+      observation: `Their headline says ${profile.headline || roleLabel}${company ? `, with ${company} as the current company` : ''}.`,
+      suggestion: `Keep it simple and accurate: “I saw you’re ${roleLabel || profile.headline}${company ? ` at ${company}` : ''}. How’s that going? Casually curious if something new is on your radar?”`,
+      messageLine: `I saw you’re ${roleLabel || profile.headline}${company ? ` at ${company}` : ''}, and I was curious how that chapter is going`,
+      tone: 'role'
     });
   }
 
-  if (profile.location) {
-    addHook(hooks, {
-      type: 'Localização',
-      observation: `A localização aparece como ${profile.location}.`,
-      suggestion: 'Pode ser útil falar de modelo remoto/híbrido, equipa local ou ligação ao mercado dessa cidade/país.',
-      messageLine: `reparei que estás em ${profile.location}, por isso pode fazer sentido falar também do modelo de trabalho`
-    });
-  }
+  const aboutHook = buildAboutHook(profile);
+  if (aboutHook) addHook(hooks, aboutHook);
 
-  if (profile.aboutSummary) {
-    addHook(hooks, {
-      type: 'About / resumo',
-      observation: profile.aboutSummary,
-      suggestion: 'Usa isto para mostrar que leste o perfil: pega numa motivação, domínio, indústria ou forma como a pessoa se apresenta.',
-      messageLine: `gostei do resumo do teu perfil, sobretudo da parte sobre ${profile.aboutSummary}`
-    });
-  }
+  const skillHook = buildRoleAwareSkillHook(profile);
+  if (skillHook) addHook(hooks, skillHook);
 
-  const technicalSkills = profile.technicalSkills?.slice(0, 8) || [];
-  if (technicalSkills.length) {
-    addHook(hooks, {
-      type: 'Skills técnicas',
-      observation: `Aparecem várias skills técnicas: ${formatList(technicalSkills)}.`,
-      suggestion: `Dica: escolhe 1 ou 2 destas skills e abre conversa. Ex.: “Vi que trabalhas com ${technicalSkills.slice(0, 2).join(' e ')} — tens feito mais disto no dia a dia?”`,
-      messageLine: `tens no perfil várias skills como ${formatList(technicalSkills.slice(0, 3))}`
-    });
-  }
+  const certificationHook = buildCertificationHook(profile);
+  if (certificationHook) addHook(hooks, certificationHook);
 
-  const certifications = profile.certifications?.slice(0, 5) || [];
-  if (certifications.length) {
-    addHook(hooks, {
-      type: 'Certificações',
-      observation: `Há sinais de certificações/credenciais: ${formatList(certifications)}.`,
-      suggestion: 'Boa abordagem: perguntar que ligação estas certificações têm com o trabalho atual ou que áreas quer aprofundar a seguir.',
-      messageLine: `reparei nas tuas certificações e fiquei curioso para perceber como as tens usado no trabalho`
-    });
-  }
+  const activityHook = buildActivityHook(profile);
+  if (activityHook) addHook(hooks, activityHook);
 
-  const cloudThemes = profile.cloudSignals?.slice(0, 6) || [];
-  if (cloudThemes.length) {
+  profile.experience?.slice(0, 2).forEach((item) => {
     addHook(hooks, {
-      type: 'Cloud / tecnologias',
-      observation: `O perfil aponta para temas cloud/tech como ${formatList(cloudThemes)}.`,
-      suggestion: 'Em vez de listar buzzwords, pergunta onde tem mais experiência ou qual destas tecnologias prefere usar.',
-      messageLine: `tens alguns sinais fortes de cloud/tecnologia no perfil e gostava de perceber em que stack tens trabalhado mais`
-    });
-  }
-
-  const activityThemes = profile.activityThemes?.slice(0, 5) || [];
-  if (activityThemes.length) {
-    addHook(hooks, {
-      type: 'Publicações / interesses',
-      observation: `A atividade visível sugere interesse em ${formatList(activityThemes.map((theme) => `${theme.label} (${theme.count})`))}.`,
-      suggestion: `Talvez explore este tema: “Vi que interagiste/falaste algumas vezes sobre ${activityThemes[0].label}. É uma área que gostas mesmo de trabalhar?”`,
-      messageLine: `notei alguma atividade à volta de ${activityThemes[0].label} e fiquei curioso para perceber se é uma área que gostas de explorar`
-    });
-  }
-
-  profile.experience?.slice(0, 3).forEach((item) => {
-    addHook(hooks, {
-      type: 'Experiência',
+      id: `experience-${item}`,
+      type: 'Experience detail',
       observation: item,
-      suggestion: 'Usa como contexto, mas transforma em pergunta: “O que tens gostado mais nessa função/equipa?”',
-      messageLine: `tens experiência em ${item}`
+      suggestion: `Use this only as context and turn it into a question: “What have you enjoyed most about that role?”`,
+      messageLine: `I noticed your experience around ${item}, and it looked close to the kind of profile I’m researching`,
+      tone: 'experience'
     });
   });
 
-  return uniqueHooks(hooks).slice(0, 16);
+  return uniqueHooks(hooks).slice(0, 14);
+}
+
+function buildAboutHook(profile) {
+  if (!profile.aboutSummary) return null;
+
+  return {
+    id: 'about',
+    type: 'About section',
+    observation: profile.aboutSummary,
+    suggestion: 'Reference one specific line from the About section and ask a light follow-up. It feels much less copy-paste than repeating their job title.',
+    messageLine: `your About section had a line that stood out to me: “${profile.aboutSummary}”`,
+    tone: 'about'
+  };
+}
+
+function buildRoleAwareSkillHook(profile) {
+  const relevantSkills = getRoleRelevantSkills(profile);
+  if (!relevantSkills.length) return null;
+
+  const roleLabel = profile.roleCategory || simplifyRole(profile.headline) || 'your role';
+  return {
+    id: 'skills',
+    type: 'Role-matched skills',
+    observation: `For a ${roleLabel} profile, the most relevant skills I found are: ${formatList(relevantSkills)}.`,
+    suggestion: `Use only skills that match the title. Example: “I saw ${relevantSkills.slice(0, 2).join(' and ')} on your profile — is that still a big part of your day-to-day?”`,
+    messageLine: `I saw ${formatList(relevantSkills.slice(0, 3))} on your profile, which actually lines up with the kind of ${roleLabel} background I’m looking at`,
+    tone: 'skills'
+  };
+}
+
+function buildCertificationHook(profile) {
+  const certifications = profile.certifications?.slice(0, 5) || [];
+  if (!certifications.length) return null;
+
+  return {
+    id: 'certifications',
+    type: 'Certifications',
+    observation: `I found certification or credential signals around: ${formatList(certifications)}.`,
+    suggestion: 'Ask how those certifications connect to their actual work, rather than assuming they want another certification-heavy role.',
+    messageLine: `I noticed the ${formatList(certifications.slice(0, 2))} certification signals and wondered if those are part of your current work or more of a “collecting badges like Pokémon” situation`,
+    tone: 'certifications'
+  };
+}
+
+function buildActivityHook(profile) {
+  const themes = profile.activityThemes?.slice(0, 4) || [];
+  if (!themes.length) return null;
+
+  const mainTheme = themes[0].label;
+  return {
+    id: 'activity',
+    type: 'Posts / activity themes',
+    observation: `Visible activity points to repeated themes like ${formatList(themes.map((theme) => `${theme.label} (${theme.count})`))}.`,
+    suggestion: `Do not over-focus on random likes. Use it softly: “I saw a few ${mainTheme} signals around your activity — is that a topic you actually enjoy?”`,
+    messageLine: `I saw a few ${mainTheme} signals around your public activity and wondered if that’s a topic you actually enjoy, or if LinkedIn’s algorithm is just being LinkedIn again`,
+    tone: 'activity'
+  };
 }
 
 function addHook(hooks, hook) {
@@ -169,7 +216,7 @@ function renderHooks(hooks, profile) {
 
   hooks.forEach((hook) => {
     const card = document.createElement('article');
-    card.className = 'hook-card';
+    card.className = `hook-card${selectedHook?.id === hook.id ? ' selected' : ''}`;
 
     const title = document.createElement('strong');
     title.textContent = hook.type;
@@ -183,8 +230,8 @@ function renderHooks(hooks, profile) {
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'secondary compact';
-    button.textContent = 'Use in message';
-    button.addEventListener('click', () => insertHookIntoMessage(hook));
+    button.textContent = selectedHook?.id === hook.id ? 'Selected' : 'Use this hook';
+    button.addEventListener('click', () => selectHook(hook));
 
     card.append(title, observation, suggestion, button);
     hooksContainer.appendChild(card);
@@ -197,23 +244,25 @@ function renderVisualHooks(profile) {
   const wrapper = document.createElement('div');
   wrapper.className = 'visual-grid';
 
-  const profileCard = createVisualCard({
-    title: 'Foto de perfil',
-    image: profile?.profileImage,
-    prompt: 'Olha para a foto: se aparecer uma cidade, evento, medalha, desporto, animal ou algo engraçado, pode ser uma entrada natural. Ex.: “a tua foto parece ser numa cidade fixe — é Lisboa/Porto/Londres?”'
-  });
+  wrapper.append(
+    createVisualCard({
+      title: 'Profile photo',
+      image: profile?.profileImage,
+      comment: buildImageComment('photo', profile?.profileImage),
+      prompt: 'Use the actual photo preview here. If it shows a city, event, medal, sport, pet, or funny detail, add a short note below and the draft will rewrite around it.'
+    }),
+    createVisualCard({
+      title: 'Banner',
+      image: profile?.bannerImage,
+      comment: buildImageComment('banner', profile?.bannerImage),
+      prompt: 'Use the actual banner preview here. If it has technologies, architecture diagrams, cloud logos, certifications, or a skyline, ask about that connection.'
+    })
+  );
 
-  const bannerCard = createVisualCard({
-    title: 'Banner',
-    image: profile?.bannerImage,
-    prompt: 'Olha para o banner: se tiver várias tecnologias, cloud logos, certificações, arquitetura ou uma cidade, pergunta a ligação. Ex.: “vi várias tecnologias no teu banner — quais são as que mais usas hoje?”'
-  });
-
-  wrapper.append(profileCard, bannerCard);
   hooksContainer.appendChild(wrapper);
 }
 
-function createVisualCard({ title, image, prompt }) {
+function createVisualCard({ title, image, comment, prompt }) {
   const card = document.createElement('article');
   card.className = 'hook-card visual';
 
@@ -229,32 +278,54 @@ function createVisualCard({ title, image, prompt }) {
     card.appendChild(preview);
   }
 
-  const text = document.createElement('p');
-  text.textContent = prompt;
-  card.appendChild(text);
+  const commentText = document.createElement('p');
+  commentText.textContent = comment;
+  card.appendChild(commentText);
 
-  if (image?.alt) {
-    const alt = document.createElement('small');
-    alt.textContent = `Texto/metadata encontrado: ${image.alt}`;
-    card.appendChild(alt);
-  }
+  const hint = document.createElement('small');
+  hint.textContent = prompt;
+  card.appendChild(hint);
 
   return card;
 }
 
-function insertHookIntoMessage(hook) {
-  const insertion = `\n\nIdeia de personalização: ${hook.messageLine || hook.observation}.`;
-  outreachMessageInput.value = `${outreachMessageInput.value.trim()}${insertion}`;
+function buildImageComment(type, image) {
+  if (!image?.src) {
+    return `I could not detect a ${type} image preview on this profile. If you can see one on LinkedIn, add the human observation manually.`;
+  }
+
+  const alt = image.alt && !/profile|background|image|photo/i.test(image.alt) ? ` The alt text says “${image.alt}”, which may be usable if it matches what you see.` : '';
+  if (type === 'banner') {
+    return `The candidate has a custom banner image. I can show it, but I cannot reliably understand the objects without vision AI.${alt} If you see tech logos, a city, certificates, or architecture, that is likely the strongest visual opener.`;
+  }
+
+  return `The candidate has a visible profile photo. I can show it, but I cannot reliably identify the scene without vision AI.${alt} If the photo has a city, event, sport, pet, or something funny, use that as a light opener.`;
+}
+
+function selectHook(hook) {
+  selectedHook = hook;
+  renderHooks(currentHooks, currentProfile);
+  refreshMessageFromInputs();
 }
 
 function buildOutreachMessage(profile, hooks, visualNote) {
   const firstName = (profile.name || '').split(' ')[0];
-  const roleHook = hooks.find((hook) => hook.type === 'Título atual');
-  const strongestHook = roleHook || hooks.find((hook) => !hook.type.toLowerCase().includes('metadata'));
-  const hookSentence = strongestHook ? `Reparei que ${strongestHook.messageLine}.` : `Reparei na tua experiência em ${profile.headline || 'tecnologia'}.`;
-  const visualSentence = visualNote ? ` Também achei interessante ${lowercaseFirstLetter(visualNote)}.` : '';
+  const hook = selectedHook || hooks[0];
+  const visualSentence = visualNote ? ` Also, random but I noticed ${lowercaseFirstLetter(visualNote)} — had to mention it.` : '';
+  const hookSentence = hook ? buildHookSentence(hook) : `I came across your profile and it felt relevant to a role I’m working on.`;
+  const roleContext = profile.roleCategory || simplifyRole(profile.headline) || 'your background';
+  const companyQuestion = profile.currentCompany ? `How are things going at ${profile.currentCompany}?` : `How are things going in your current role?`;
 
-  return `Olá${firstName ? ` ${firstName}` : ''},\n\n${hookSentence}${visualSentence}\n\nComo tem sido essa experiência${profile.currentCompany ? ` na ${profile.currentCompany}` : ''}? Estás aberto/a a ouvir algo novo, numa oportunidade próxima do que já fazes hoje?\n\nObrigado,`;
+  return `Hey${firstName ? ` ${firstName}` : ''},\n\n${hookSentence}${visualSentence}\n\n${companyQuestion} Tiny recruiter question, promise: would you be open to hearing about something new that is close to your ${roleContext} world, or should I quietly disappear back into the LinkedIn jungle?\n\nThanks!`;
+}
+
+function buildHookSentence(hook) {
+  if (hook.tone === 'role') return `I saw your title and noticed ${hook.messageLine}.`;
+  if (hook.tone === 'skills') return `I noticed ${hook.messageLine}.`;
+  if (hook.tone === 'certifications') return `I noticed ${hook.messageLine}.`;
+  if (hook.tone === 'activity') return `I noticed ${hook.messageLine}.`;
+  if (hook.tone === 'about') return `I read your About section and ${hook.messageLine}.`;
+  return `I noticed ${hook.messageLine || hook.observation}.`;
 }
 
 function refreshMessageFromInputs() {
@@ -262,7 +333,9 @@ function refreshMessageFromInputs() {
     ...(currentProfile || {}),
     name: nameInput.value.trim(),
     headline: headlineInput.value.trim(),
-    location: locationInput.value.trim()
+    roleFamily: getRoleFamily(headlineInput.value.trim()),
+    roleCategory: simplifyRole(headlineInput.value.trim()),
+    currentCompany: currentProfile?.currentCompany || findCompanyFromHeadline(headlineInput.value.trim())
   };
 
   outreachMessageInput.value = buildOutreachMessage(profile, currentHooks, visualNoteInput.value.trim());
@@ -295,7 +368,7 @@ function isLinkedInProfile(url = '') {
 
 function formatHooksForClipboard() {
   if (!currentHooks.length) return '';
-  return currentHooks.map((hook) => `- ${hook.type}: ${hook.observation}\n  Dica: ${hook.suggestion}`).join('\n');
+  return currentHooks.map((hook) => `- ${hook.type}: ${hook.observation}\n  Tip: ${hook.suggestion}`).join('\n');
 }
 
 async function copyText(value, successMessage) {
@@ -308,18 +381,79 @@ async function copyText(value, successMessage) {
   setStatus(successMessage);
 }
 
+function getRoleRelevantSkills(profile) {
+  const roleFamily = profile.roleFamily || getRoleFamily(profile.headline);
+  const detectedSkills = profile.technicalSkills || [];
+  const allowedSkills = getAllowedSkillsForProfile(profile);
+
+  if ([ROLE_FAMILIES.SOFTWARE, ROLE_FAMILIES.DATA, ROLE_FAMILIES.CLOUD].includes(roleFamily)) {
+    return detectedSkills.filter((skill) => allowedSkills.some((allowed) => sameSkillFamily(skill, allowed))).slice(0, 6);
+  }
+
+  if ([ROLE_FAMILIES.PRODUCT, ROLE_FAMILIES.RECRUITING, ROLE_FAMILIES.DESIGN, ROLE_FAMILIES.LEADERSHIP].includes(roleFamily)) {
+    const profileTextSkills = [...(profile.skills || []), ...(profile.experience || [])].join(' ');
+    return allowedSkills.filter((skill) => profileTextSkills.toLowerCase().includes(skill.toLowerCase())).slice(0, 5);
+  }
+
+  return [];
+}
+
+
+function getAllowedSkillsForProfile(profile) {
+  const headline = (profile.headline || '').toLowerCase();
+  const roleFamily = profile.roleFamily || getRoleFamily(profile.headline);
+
+  if (/back\s?end|backend/.test(headline)) {
+    return ['Node.js', 'Java', 'Python', 'C#', '.NET', 'SQL', 'PostgreSQL', 'MySQL', 'MongoDB', 'Kafka', 'API', 'Microservices', 'AWS', 'Azure', 'GCP'];
+  }
+
+  if (/front\s?end|frontend/.test(headline)) {
+    return ['JavaScript', 'TypeScript', 'React', 'Angular', 'Vue', 'HTML', 'CSS', 'UI', 'Design Systems'];
+  }
+
+  if (/full\s?stack|full-stack/.test(headline)) {
+    return FAMILY_SKILL_HINTS[ROLE_FAMILIES.SOFTWARE];
+  }
+
+  return FAMILY_SKILL_HINTS[roleFamily] || [];
+}
+
+function getRoleFamily(headline = '') {
+  const lower = headline.toLowerCase();
+  if (/recruit|talent|sourc/.test(lower)) return ROLE_FAMILIES.RECRUITING;
+  if (/product owner|product manager|\bpm\b|product lead/.test(lower)) return ROLE_FAMILIES.PRODUCT;
+  if (/designer|\bux\b|\bui\b|researcher/.test(lower)) return ROLE_FAMILIES.DESIGN;
+  if (/data|analytics|machine learning|\bml\b|\bai\b/.test(lower)) return ROLE_FAMILIES.DATA;
+  if (/devops|cloud|site reliability|\bsre\b|platform|infrastructure/.test(lower)) return ROLE_FAMILIES.CLOUD;
+  if (/full\s?stack|front\s?end|frontend|back\s?end|backend|software|developer|engineer|programmer|architect/.test(lower)) return ROLE_FAMILIES.SOFTWARE;
+  if (/manager|lead|head of|director|vp/.test(lower)) return ROLE_FAMILIES.LEADERSHIP;
+  return ROLE_FAMILIES.GENERAL;
+}
+
 function simplifyRole(headline = '') {
   const lower = headline.toLowerCase();
+  if (/recruit|talent acquisition/.test(lower)) return 'Recruiter / Talent Acquisition profile';
+  if (/product owner|product manager|product lead/.test(lower)) return 'Product profile';
   if (/full\s?stack|full-stack/.test(lower)) return 'Fullstack Developer';
   if (/front\s?end|frontend/.test(lower)) return 'Frontend Developer';
   if (/back\s?end|backend/.test(lower)) return 'Backend Developer';
   if (/devops|site reliability|sre/.test(lower)) return 'DevOps Engineer';
   if (/data engineer/.test(lower)) return 'Data Engineer';
-  if (/data scientist|machine learning| ml | ai /.test(` ${lower} `)) return 'AI/Data specialist';
+  if (/data scientist|machine learning|\bml\b|\bai\b/.test(lower)) return 'AI/Data profile';
   if (/architect/.test(lower)) return 'Software Architect';
   if (/engineer|developer|programmer/.test(lower)) return 'Software Engineer';
-  if (/manager|lead|head of/.test(lower)) return 'Tech Lead/Manager';
+  if (/manager|lead|head of/.test(lower)) return 'Leadership profile';
   return headline.split('|')[0].split(' at ')[0].trim();
+}
+
+function findCompanyFromHeadline(headline = '') {
+  return headline.match(/\b(?:at|@)\s+([^|•,-]+)/i)?.[1]?.trim() || '';
+}
+
+function sameSkillFamily(left, right) {
+  const normalizedLeft = left.toLowerCase();
+  const normalizedRight = right.toLowerCase();
+  return normalizedLeft.includes(normalizedRight) || normalizedRight.includes(normalizedLeft);
 }
 
 function formatList(items) {
