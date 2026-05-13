@@ -1,0 +1,132 @@
+ (cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF' 
+diff --git a/linkedin-contact-tracker/popup.html b/linkedin-contact-tracker/popup.html
+index 4751dcce32c63e607c522d909aeb1045e9110e40..3ed54ce6a4e231ac6346164d59dd9f3e2a766e46 100644
+--- a/linkedin-contact-tracker/popup.html
++++ b/linkedin-contact-tracker/popup.html
+@@ -1,63 +1,108 @@
+ <!doctype html>
+-<html lang="pt-PT">
++<html lang="en">
+   <head>
+     <meta charset="UTF-8" />
+     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+-    <title>LinkedIn Contact Tracker</title>
++    <title>LinkedIn Recruiter Profile Assistant</title>
+     <link rel="stylesheet" href="popup.css" />
+   </head>
+   <body>
+     <main class="app">
+-      <h1>LinkedIn Contact Tracker</h1>
++      <header class="hero">
++        <p class="eyebrow">Recruiter helper</p>
++        <h1>LinkedIn Profile Assistant</h1>
++        <p>Capture candidate-specific details and turn them into outreach hooks.</p>
++      </header>
+ 
+       <section class="card">
+-        <h2>Novo contacto</h2>
++        <h2>Analyze current profile</h2>
++        <p class="hint">Open a LinkedIn profile, then click analyze. Add any visual detail you notice in the photo or banner for extra personalization.</p>
++        <div class="form-actions">
++          <button id="analyzeProfile" type="button">Analyze LinkedIn profile</button>
++          <button id="prefillCurrent" type="button" class="secondary">Use current tab link</button>
++        </div>
++        <p id="analysisStatus" class="status-message" aria-live="polite"></p>
++      </section>
++
++      <section class="card">
++        <h2>Candidate snapshot</h2>
+         <form id="contactForm">
+           <label>
+-            Nome
++            Name
+             <input id="name" type="text" placeholder="Ex.: Ana Silva" required />
+           </label>
+ 
+           <label>
+-            Link LinkedIn
++            Current title / headline
++            <input id="headline" type="text" placeholder="Ex.: Senior DevOps Engineer at Acme" />
++          </label>
++
++          <label>
++            Location
++            <input id="location" type="text" placeholder="Ex.: Lisbon, Portugal" />
++          </label>
++
++          <label>
++            LinkedIn URL
+             <input id="linkedinUrl" type="url" placeholder="https://www.linkedin.com/in/..." required />
+           </label>
+ 
++          <label>
++            Photo or banner curiosity
++            <textarea id="visualNote" rows="2" placeholder="Ex.: banner shows Porto skyline; profile photo includes a marathon medal; funny dog picture..."></textarea>
++          </label>
++
++          <label>
++            Profile clues for outreach
++            <textarea id="profileNotes" rows="5" placeholder="Certifications, recent posts, skills, awards, projects, current role details..."></textarea>
++          </label>
++
++          <label>
++            Outreach message example
++            <textarea id="outreachMessage" rows="7" placeholder="Analyze a profile or write your own message..."></textarea>
++          </label>
++
+           <div class="form-actions">
+-            <button type="submit">Adicionar</button>
+-            <button id="prefillCurrent" type="button" class="secondary">
+-              Pré-preencher da tab atual
+-            </button>
++            <button type="submit">Save candidate</button>
++            <button id="copyMessage" type="button" class="secondary">Copy message</button>
+           </div>
+         </form>
+       </section>
+ 
++      <section id="insightsCard" class="card hidden">
++        <h2>Personalization choices</h2>
++        <div id="insights" class="insights"></div>
++      </section>
++
+       <section class="card">
+-        <h2>Métricas</h2>
++        <h2>Pipeline metrics</h2>
+         <div id="metrics" class="metrics"></div>
+       </section>
+ 
+       <section class="card">
+-        <h2>Contactos</h2>
+-        <p class="hint">Muda o estado para acompanhar respostas, entrevistas e submissões.</p>
++        <h2>Saved candidates</h2>
++        <p class="hint">Track outreach status and reuse candidate-specific notes later.</p>
+         <div id="contacts" class="contacts"></div>
+       </section>
+     </main>
+ 
+     <template id="contactTemplate">
+       <article class="contact-item">
+         <div class="contact-main">
+           <a class="contact-name" target="_blank" rel="noopener noreferrer"></a>
+           <small class="created-at"></small>
+         </div>
++        <p class="contact-headline"></p>
++        <p class="contact-notes"></p>
+         <div class="contact-controls">
+           <select class="status-select"></select>
+-          <button class="mark-contacted" type="button">Passar a Contactado</button>
+-          <button class="remove" type="button">Remover</button>
++          <button class="copy-saved-message secondary" type="button">Copy message</button>
++          <button class="mark-contacted" type="button">Mark contacted</button>
++          <button class="remove" type="button">Remove</button>
+         </div>
+       </article>
+     </template>
+ 
+     <script src="popup.js"></script>
+   </body>
+ </html>
+ 
+EOF
+)
