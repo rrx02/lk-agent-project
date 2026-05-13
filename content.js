@@ -34,6 +34,55 @@ const CLOUD_KEYWORDS = [
   'ci/cd'
 ];
 
+const TECHNICAL_SKILL_KEYWORDS = [
+  'javascript',
+  'typescript',
+  'react',
+  'angular',
+  'vue',
+  'node.js',
+  'node',
+  'python',
+  'java',
+  'c#',
+  '.net',
+  'spring',
+  'sql',
+  'postgresql',
+  'mysql',
+  'mongodb',
+  'kafka',
+  'spark',
+  'databricks',
+  'snowflake',
+  'aws',
+  'azure',
+  'gcp',
+  'docker',
+  'kubernetes',
+  'terraform',
+  'jenkins',
+  'github actions',
+  'ci/cd',
+  'machine learning',
+  'ai',
+  'llm',
+  'cybersecurity'
+];
+
+const ACTIVITY_TOPIC_KEYWORDS = [
+  { label: 'Azure', keywords: ['azure', 'microsoft cloud'] },
+  { label: 'AWS', keywords: ['aws', 'amazon web services'] },
+  { label: 'Google Cloud', keywords: ['gcp', 'google cloud'] },
+  { label: 'AI / Machine Learning', keywords: ['ai', 'artificial intelligence', 'machine learning', 'llm', 'genai'] },
+  { label: 'Cloud', keywords: ['cloud', 'serverless', 'kubernetes', 'docker'] },
+  { label: 'Data', keywords: ['data', 'analytics', 'snowflake', 'databricks', 'spark'] },
+  { label: 'Cybersecurity', keywords: ['security', 'cybersecurity', 'cissp', 'zero trust'] },
+  { label: 'DevOps', keywords: ['devops', 'terraform', 'ci/cd', 'sre'] },
+  { label: 'Frontend', keywords: ['frontend', 'react', 'angular', 'vue'] },
+  { label: 'Backend', keywords: ['backend', 'api', 'microservices'] }
+];
+
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (message?.type !== 'EXTRACT_LINKEDIN_PROFILE') return false;
 
@@ -49,9 +98,14 @@ function extractLinkedInProfile() {
   const location = getLocation();
   const profileImage = getProfileImage();
   const bannerImage = getBannerImage(profileImage?.src);
-  const certifications = findKeywordLines(visibleText, CERTIFICATION_KEYWORDS, 8);
-  const cloudSignals = findKeywordLines(visibleText, CLOUD_KEYWORDS, 8);
+  const certifications = findMatchedKeywords(visibleText, CERTIFICATION_KEYWORDS, 8);
+  const cloudSignals = findMatchedKeywords(visibleText, CLOUD_KEYWORDS, 8);
   const recentActivity = findRecentActivity(sections, visibleText);
+  const technicalSkills = findTechnicalSkills(sections, visibleText);
+  const activityThemes = findActivityThemes(visibleText);
+  const currentCompany = findCurrentCompany(headline, sections.experience);
+  const roleCategory = simplifyRole(headline);
+  const aboutSummary = summarizeAbout(sections.about);
 
   return {
     url: locationHrefWithoutTracking(),
@@ -59,12 +113,17 @@ function extractLinkedInProfile() {
     name,
     headline,
     location,
+    currentCompany,
+    roleCategory,
     about: sections.about,
+    aboutSummary,
     experience: sections.experience,
     education: sections.education,
     skills: sections.skills,
     certifications,
     cloudSignals,
+    technicalSkills,
+    activityThemes,
     recentActivity,
     profileImage,
     bannerImage,
@@ -173,6 +232,102 @@ function extractSectionHighlights(text, sectionName, maxItems) {
       .filter((line) => !skip.has(line.toLowerCase()))
       .filter((line) => !/^\d+/.test(line))
   ).slice(0, maxItems);
+}
+
+
+function findMatchedKeywords(text, keywords, maxItems) {
+  const normalized = text.toLowerCase();
+  return unique(keywords.filter((keyword) => normalized.includes(keyword.toLowerCase()))).slice(0, maxItems);
+}
+
+function findTechnicalSkills(sections, visibleText) {
+  const skillText = [...sections.skills, visibleText].join('\n').toLowerCase();
+  return unique(
+    TECHNICAL_SKILL_KEYWORDS.filter((skill) => skillText.includes(skill.toLowerCase()))
+      .map((skill) => normalizeSkillLabel(skill))
+  ).slice(0, 12);
+}
+
+function findActivityThemes(visibleText) {
+  const lower = visibleText.toLowerCase();
+  return ACTIVITY_TOPIC_KEYWORDS.map((theme) => ({
+    label: theme.label,
+    count: theme.keywords.reduce((total, keyword) => total + countOccurrences(lower, keyword.toLowerCase()), 0)
+  }))
+    .filter((theme) => theme.count > 0)
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 8);
+}
+
+function countOccurrences(text, keyword) {
+  if (!keyword) return 0;
+  if (/^[a-z0-9+#./-]{1,3}$/i.test(keyword)) {
+    return (text.match(new RegExp(`\\b${escapeRegExp(keyword)}\\b`, 'g')) || []).length;
+  }
+  return text.split(keyword).length - 1;
+}
+
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function findCurrentCompany(headline, experience) {
+  const headlineCompany = headline.match(/\b(?:at|@)\s+([^|•,-]+)/i)?.[1];
+  if (headlineCompany) return cleanLine(headlineCompany);
+
+  const experienceCompany = experience.find((line) =>
+    !/engineer|developer|architect|manager|lead|consultant|analyst|specialist|present|full-time|part-time/i.test(line)
+  );
+  return cleanLine(experienceCompany || '');
+}
+
+function simplifyRole(headline = '') {
+  const lower = headline.toLowerCase();
+  if (/full\s?stack|full-stack/.test(lower)) return 'Fullstack Developer';
+  if (/front\s?end|frontend/.test(lower)) return 'Frontend Developer';
+  if (/back\s?end|backend/.test(lower)) return 'Backend Developer';
+  if (/devops|site reliability|sre/.test(lower)) return 'DevOps Engineer';
+  if (/data engineer/.test(lower)) return 'Data Engineer';
+  if (/data scientist|machine learning|\bml\b|\bai\b/.test(lower)) return 'AI/Data specialist';
+  if (/architect/.test(lower)) return 'Software Architect';
+  if (/engineer|developer|programmer/.test(lower)) return 'Software Engineer';
+  if (/manager|lead|head of/.test(lower)) return 'Tech Lead/Manager';
+  return cleanLine(headline.split('|')[0].split(' at ')[0]);
+}
+
+function summarizeAbout(about = '') {
+  if (!about) return '';
+  const sentences = about.match(/[^.!?]+[.!?]?/g) || [about];
+  return cleanLine(sentences.slice(0, 2).join(' ')).slice(0, 260);
+}
+
+function normalizeSkillLabel(skill) {
+  const labels = {
+    'node': 'Node.js',
+    'node.js': 'Node.js',
+    'javascript': 'JavaScript',
+    'typescript': 'TypeScript',
+    'react': 'React',
+    'angular': 'Angular',
+    'vue': 'Vue',
+    'python': 'Python',
+    'java': 'Java',
+    'c#': 'C#',
+    '.net': '.NET',
+    'sql': 'SQL',
+    'postgresql': 'PostgreSQL',
+    'mysql': 'MySQL',
+    'mongodb': 'MongoDB',
+    'kafka': 'Kafka',
+    'spark': 'Spark',
+    'aws': 'AWS',
+    'azure': 'Azure',
+    'gcp': 'GCP',
+    'ci/cd': 'CI/CD',
+    'ai': 'AI',
+    'llm': 'LLM'
+  };
+  return labels[skill.toLowerCase()] || skill;
 }
 
 function findKeywordLines(text, keywords, maxItems) {
