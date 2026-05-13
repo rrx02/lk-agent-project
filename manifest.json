@@ -1,24 +1,29 @@
 {
   "manifest_version": 3,
-  "name": "LinkedIn Contact Tracker",
-  "description": "Acompanha contactos do LinkedIn e métricas de resposta, entrevistas e submissões.",
-  "version": "1.0.0",
-  "permissions": ["storage", "tabs", "activeTab"],
   "name": "LinkedIn Recruiter Profile Assistant",
   "description": "Captures LinkedIn profile clues and turns them into personalized recruiter outreach ideas.",
   "version": "1.1.0",
-  "permissions": ["storage", "tabs", "activeTab", "scripting"],
-  "host_permissions": ["https://*.linkedin.com/*"],
+  "permissions": [
+    "storage",
+    "tabs",
+    "activeTab",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://*.linkedin.com/*"
+  ],
   "action": {
-    "default_title": "LinkedIn Contact Tracker",
     "default_title": "LinkedIn Recruiter Profile Assistant",
     "default_popup": "popup.html"
-  }
   },
   "content_scripts": [
     {
-      "matches": ["https://*.linkedin.com/in/*"],
-      "js": ["content.js"],
+      "matches": [
+        "https://*.linkedin.com/in/*"
+      ],
+      "js": [
+        "content.js"
+      ],
       "run_at": "document_idle"
     }
   ]
