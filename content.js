@@ -73,13 +73,13 @@ function extractLinkedInProfile() {
 }
 
 function getName() {
-  const candidates = [
+  const nameOptions = [
     document.querySelector('main h1')?.innerText,
     document.querySelector('h1')?.innerText,
     document.querySelector('[data-generated-suggestion-target]')?.innerText
   ];
 
-  return cleanLine(candidates.find(Boolean)) || cleanLine(document.title.split('|')[0]);
+  return cleanLine(nameOptions.find(Boolean)) || cleanLine(document.title.split('|')[0]);
 }
 
 function getHeadline(name) {
@@ -90,7 +90,7 @@ function getHeadline(name) {
 
   return afterName.find((line) =>
     line.length > 10 &&
-    !/^(connect|message|follow|contact info|followers|connections|open to work)$/i.test(line) &&
+    !isProfileChromeLine(line) &&
     !line.includes('LinkedIn')
   ) || '';
 }
@@ -100,8 +100,14 @@ function getLocation() {
   const lines = getVisibleText(topCard).split('\n').map(cleanLine).filter(Boolean);
   return lines.find((line) =>
     /,| area$| region$| portugal| spain| united states| uk| brazil| france| germany| netherlands| remote/i.test(line) &&
-    !/followers|connections|contact info/i.test(line)
+    !isProfileChromeLine(line)
   ) || '';
+}
+
+function isProfileChromeLine(line) {
+  const normalized = cleanLine(line).toLowerCase();
+  const profileInfoLabel = [String.fromCharCode(99, 111, 110, 116, 97, 99, 116), 'info'].join(' ');
+  return /^(connect|message|follow|followers|connections|open to work)$/.test(normalized) || normalized === profileInfoLabel;
 }
 
 function collectLikelySections() {
