@@ -1,21 +1,21 @@
 # LinkedIn Profile Hook Analyzer (Chrome Extension)
 
-A Chrome extension for recruiters who want to analyze a LinkedIn profile and identify concrete, human conversation hooks for a personalized first message.
+A Chrome extension for recruiters who want to analyze a LinkedIn profile and create accurate, informal, playful outreach hooks.
 
-This project is only for hook analysis. It reads visible information from the current LinkedIn profile tab and helps the recruiter choose useful outreach angles.
+This project is only for hook analysis. It reads visible information from the current LinkedIn profile tab and helps the recruiter choose one strong outreach angle at a time.
 
 The extension helps you:
 
-- capture the profile name, URL, headline, current company and location from the current LinkedIn profile;
-- turn the title into a simple opener, for example: “vi que és Fullstack Developer na empresa X — como tem sido aí?”;
-- show profile photo and banner previews so the recruiter can spot a city, technology banner, cloud/certification graphic, event, sport, pet or funny detail;
-- summarize useful About/profile text and suggest how to use it naturally;
-- summarize technical skills that appear on the profile and suggest choosing one or two to start the conversation;
-- detect cloud/certification signals and suggest asking how those certifications connect to the person's current work;
-- detect repeated public activity themes, such as Azure, AI or cloud, and suggest exploring whether those topics are genuine interests;
-- generate an editable outreach example asking whether the person is open to something new near their current role.
+- capture the profile name, URL, headline and current company from the current LinkedIn profile;
+- turn the title into a simple opener that matches the profile, for example: “I saw you’re a Fullstack Developer at Acme — how’s that chapter going?”;
+- show profile photo and banner previews so the recruiter can add a real image observation, such as a city skyline, technology banner, certification graphic, event, sport, pet or funny detail;
+- summarize useful About/profile text and suggest a natural follow-up;
+- summarize only skills that match the person’s title, so a recruiter profile does not get a frontend pitch and a backend profile does not get a product pitch;
+- detect cloud/certification signals and suggest asking how those certifications connect to the person’s actual work;
+- detect repeated public activity themes, such as Azure, AI or cloud, without over-focusing on random likes;
+- generate an editable message draft that rewrites itself around the selected hook instead of stacking unrelated hooks.
 
-> Important: the extension only reads information visible in the current browser tab. It does not use AI image recognition, does not bypass LinkedIn access controls, does not track outreach, and does not send data to an external server.
+> Important: the extension can display the candidate’s LinkedIn profile photo and banner preview, but it does not perform computer-vision image recognition. Add the visual observation you actually see in the photo/banner field and the draft will use it naturally.
 
 ---
 
@@ -36,30 +36,35 @@ The extension helps you:
 2. Click the extension icon.
 3. Click **Analyze profile**.
 4. Review the generated **Conversation hooks**.
-5. Look at the profile photo and banner previews, then write any useful visual detail in **Manual photo/banner hook**.
-6. Edit the generated outreach example so it sounds natural.
-7. Click **Copy hooks** or **Copy message**.
+5. Click **Use this hook** on the hook you want to use.
+6. Look at the profile photo and banner previews, then write any useful visual detail in **Photo or banner comment**.
+7. Edit the generated message draft if needed.
+8. Click **Copy hooks** or **Copy message**.
 
 ---
 
 ## Example hooks
 
 ```text
-Título atual
-Vejo que é Fullstack Developer na Acme.
-Dica: “Vejo que és Fullstack na Acme. Como está a correr aí? Estás aberto/a a ouvir algo novo?”
+Current title
+Their headline says Fullstack Developer at Acme.
+Tip: “I saw you’re a Fullstack Developer at Acme. How’s that going? Casually curious if something new is on your radar?”
+
+Profile photo
+The photo preview looks like it was taken at a conference stage.
+Tip: “Random opener: was that photo from a tech event, or is LinkedIn just making you look extra official?”
 
 Banner
-O banner parece ter várias tecnologias/cloud logos.
-Dica: “Vi várias tecnologias no teu banner — quais são as que mais usas hoje?”
+The banner preview shows several cloud logos.
+Tip: “I saw a few cloud logos in your banner — which one is taking most of your brain space these days?”
 
-Skills técnicas
-Aparecem várias skills técnicas: React, Node.js, AWS, Terraform.
-Dica: escolhe 1 ou 2 destas skills e pergunta se tem trabalhado mais nisso no dia a dia.
+Role-matched skills
+For a Fullstack Developer profile, the most relevant skills I found are: React, Node.js, AWS.
+Tip: “I saw React and Node.js on your profile — is that still a big part of your day-to-day?”
 
-Publicações / interesses
-A atividade visível sugere interesse em Azure e AI.
-Dica: “Vi que tens interagido com temas de Azure/AI. É uma área que gostas mesmo de explorar?”
+Posts / activity themes
+Visible activity points to repeated themes like Azure and AI.
+Tip: “I saw a few Azure/AI signals around your activity — is that something you actually enjoy, or is LinkedIn’s algorithm just being LinkedIn?”
 ```
 
 ---
@@ -67,13 +72,13 @@ Dica: “Vi que tens interagido com temas de Azure/AI. É uma área que gostas m
 ## Example outreach message
 
 ```text
-Olá Maria,
+Hey Maria,
 
-Reparei que és Fullstack Developer na Acme e gostava de perceber como está a ser essa experiência. Também achei interessante o teu banner com várias tecnologias cloud.
+I saw your title and noticed you’re a Fullstack Developer at Acme, and I was curious how that chapter is going. Also, random but I noticed your banner has a tiny cloud-logo party going on — had to mention it.
 
-Como tem sido essa experiência na Acme? Estás aberto/a a ouvir algo novo, numa oportunidade próxima do que já fazes hoje?
+How are things going at Acme? Tiny recruiter question, promise: would you be open to hearing about something new that is close to your Fullstack Developer world, or should I quietly disappear back into the LinkedIn jungle?
 
-Obrigado,
+Thanks!
 ```
 
 ---
