@@ -131,7 +131,7 @@ function buildHooks(profile) {
       type: 'Experience detail',
       observation: item,
       suggestion: `Use this only as context and turn it into a question: “What have you enjoyed most about that role?”`,
-      messageLine: `I noticed your experience around ${item}, and it looked close to the kind of profile I’m researching`,
+      messageLine: `${item}, and it looked close to the kind of profile I’m researching`,
       tone: 'experience'
     });
   });
@@ -162,7 +162,7 @@ function buildRoleAwareSkillHook(profile) {
     type: 'Role-matched skills',
     observation: `For a ${roleLabel} profile, the most relevant skills I found are: ${formatList(relevantSkills)}.`,
     suggestion: `Use only skills that match the title. Example: “I saw ${relevantSkills.slice(0, 2).join(' and ')} on your profile — is that still a big part of your day-to-day?”`,
-    messageLine: `I saw ${formatList(relevantSkills.slice(0, 3))} on your profile, which actually lines up with the kind of ${roleLabel} background I’m looking at`,
+    messageLine: `${formatList(relevantSkills.slice(0, 3))} on your profile, which actually lines up with the kind of ${roleLabel} background I’m looking at`,
     tone: 'skills'
   };
 }
@@ -176,7 +176,7 @@ function buildCertificationHook(profile) {
     type: 'Certifications',
     observation: `I found certification or credential signals around: ${formatList(certifications)}.`,
     suggestion: 'Ask how those certifications connect to their actual work, rather than assuming they want another certification-heavy role.',
-    messageLine: `I noticed the ${formatList(certifications.slice(0, 2))} certification signals and wondered if those are part of your current work or more of a “collecting badges like Pokémon” situation`,
+    messageLine: `${formatList(certifications.slice(0, 2))} certification signals and wondered if those are part of your current work or more of a “collecting badges like Pokémon” situation`,
     tone: 'certifications'
   };
 }
@@ -191,7 +191,7 @@ function buildActivityHook(profile) {
     type: 'Posts / activity themes',
     observation: `Visible activity points to repeated themes like ${formatList(themes.map((theme) => `${theme.label} (${theme.count})`))}.`,
     suggestion: `Do not over-focus on random likes. Use it softly: “I saw a few ${mainTheme} signals around your activity — is that a topic you actually enjoy?”`,
-    messageLine: `I saw a few ${mainTheme} signals around your public activity and wondered if that’s a topic you actually enjoy, or if LinkedIn’s algorithm is just being LinkedIn again`,
+    messageLine: `${mainTheme} signals around your public activity and wondered if that’s a topic you actually enjoy, or if LinkedIn’s algorithm is just being LinkedIn again`,
     tone: 'activity'
   };
 }
