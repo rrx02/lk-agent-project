@@ -11,12 +11,12 @@
       <header class="hero">
         <p class="eyebrow">LinkedIn hook analysis</p>
         <h1>Profile Hook Analyzer</h1>
-        <p>Extract profile-specific details and turn them into personalized outreach angles.</p>
+        <p>Transform profile details into concrete, human outreach hooks.</p>
       </header>
 
       <section class="card">
         <h2>Analyze current LinkedIn profile</h2>
-        <p class="hint">Open a LinkedIn profile, click analyze, then review the suggested hooks. The extension only analyzes hooks for the open profile.</p>
+        <p class="hint">Open a LinkedIn profile, click analyze, then review concrete hooks for title/company, photo, banner, about, skills, certifications and activity themes.</p>
         <div class="form-actions">
           <button id="analyzeProfile" type="button">Analyze profile</button>
           <button id="prefillCurrent" type="button" class="secondary">Use current tab link</button>
@@ -50,14 +50,14 @@
       </section>
 
       <section class="card">
-        <h2>Manual visual hook</h2>
-        <p class="hint">LinkedIn image meaning is not reliable from code. Look at the photo and banner yourself and add a specific observation if useful.</p>
-        <textarea id="visualNote" rows="3" placeholder="Ex.: banner shows Porto skyline; profile photo includes a marathon medal; funny dog picture; conference stage..."></textarea>
+        <h2>Manual photo/banner hook</h2>
+        <p class="hint">Check the image previews below: mention a city, technology banner, certification graphic, event, sport or funny detail only if it feels natural.</p>
+        <textarea id="visualNote" rows="3" placeholder="Ex.: a foto parece numa cidade fixe; o banner mostra várias tecnologias; aparece uma certificação cloud; está num evento..."></textarea>
       </section>
 
       <section id="hooksCard" class="card hidden">
         <div class="section-heading">
-          <h2>Suggested hooks</h2>
+          <h2>Conversation hooks</h2>
           <button id="copyHooks" type="button" class="secondary compact">Copy hooks</button>
         </div>
         <div id="hooks" class="hooks"></div>
@@ -65,7 +65,7 @@
 
       <section class="card">
         <div class="section-heading">
-          <h2>Outreach example</h2>
+          <h2>Mensagem exemplo</h2>
           <button id="copyMessage" type="button" class="secondary compact">Copy message</button>
         </div>
         <textarea id="outreachMessage" rows="8" placeholder="Analyze a profile to generate a message example..."></textarea>
