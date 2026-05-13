@@ -147,6 +147,20 @@ button.compact {
   gap: 8px;
 }
 
+.visual-grid {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.visual-preview {
+  background: #e5e7eb;
+  border-radius: 8px;
+  height: 96px;
+  object-fit: cover;
+  width: 100%;
+}
+
 .hook-card {
   background: #f8fafc;
   border: 1px solid #dbeafe;
