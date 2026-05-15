@@ -8,6 +8,8 @@ The extension helps you:
 
 - capture the profile name, URL, headline and current company from the current LinkedIn profile;
 - turn the title into a simple opener that matches the profile, for example: “I saw you’re a Fullstack Developer at Acme — how’s that chapter going?”;
+- vary message openers with casual, recruiter-aware, playful and leadership-safe styles;
+- adjust tone by role family: light sarcasm for engineering/data/cloud profiles, self-aware jokes for recruiters, and calmer copy for leadership profiles;
 - show profile photo and banner previews so the recruiter can add a real image observation, such as a city skyline, technology banner, certification graphic, event, sport, pet or funny detail;
 - summarize useful About/profile text and suggest a natural follow-up;
 - summarize only skills that match the person’s title, so a recruiter profile does not get a frontend pitch and a backend profile does not get a product pitch;
@@ -72,13 +74,15 @@ Tip: “I saw a few Azure/AI signals around your activity — is that something 
 ## Example outreach message
 
 ```text
-Hey Maria,
+Hey Maria 👋
 
-I saw your title and noticed you’re a Fullstack Developer at Acme, and I was curious how that chapter is going. Also, random but I noticed your banner has a tiny cloud-logo party going on — had to mention it.
+Tiny LinkedIn observation: you’re a Fullstack Developer at Acme, and I was curious how that chapter is going.
 
-How are things going at Acme? Tiny recruiter question, promise: would you be open to hearing about something new that is close to your Fullstack Developer world, or should I quietly disappear back into the LinkedIn jungle?
+Also, had to mention: your banner has a tiny cloud-logo party going on.
 
-Thanks!
+How are things going at Acme?
+
+Open to hearing about something new, or are you happily hiding from recruiters these days? 😄
 ```
 
 ---
