@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LinkedIn Profile Hook Analyzer</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <main class="app">
+      <header class="hero">
+        <p class="eyebrow">LinkedIn hook analysis</p>
+        <h1>Profile Hook Analyzer</h1>
+        <p>Turn profile details into accurate, playful outreach hooks.</p>
+      </header>
+
+      <section class="card">
+        <h2>Analyze current LinkedIn profile</h2>
+        <p class="hint">Open a LinkedIn profile, click analyze, then choose one hook. The draft rewrites around that hook instead of stacking multiple ideas.</p>
+        <div class="form-actions">
+          <button id="analyzeProfile" type="button">Analyze profile</button>
+          <button id="prefillCurrent" type="button" class="secondary">Use current tab link</button>
+        </div>
+        <p id="analysisStatus" class="status-message" aria-live="polite"></p>
+      </section>
+
+      <section class="card">
+        <h2>Profile summary</h2>
+        <div class="summary-grid">
+          <label>
+            Name
+            <input id="name" type="text" placeholder="Ex.: Ana Silva" />
+          </label>
+
+          <label>
+            Current title / headline
+            <input id="headline" type="text" placeholder="Ex.: Senior DevOps Engineer at Acme" />
+          </label>
+
+          <label>
+            LinkedIn URL
+            <input id="linkedinUrl" type="url" placeholder="https://www.linkedin.com/in/..." />
+          </label>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Photo or banner comment</h2>
+        <p class="hint">Check the image previews below. Add what you actually see in the photo or banner; the draft will include it as a light, informal opener.</p>
+        <textarea id="visualNote" rows="3" placeholder="Ex.: the banner looks like a city skyline; the photo looks like a conference stage; the banner has cloud logos..."></textarea>
+      </section>
+
+      <section id="hooksCard" class="card hidden">
+        <div class="section-heading">
+          <h2>Conversation hooks</h2>
+          <button id="copyHooks" type="button" class="secondary compact">Copy hooks</button>
+        </div>
+        <div id="hooks" class="hooks"></div>
+      </section>
+
+      <section class="card">
+        <div class="section-heading">
+          <h2>Message draft</h2>
+          <div class="draft-actions">
+            <button id="regenerateMessage" type="button" class="secondary compact">↺ Regenerate</button>
+            <button id="copyMessage" type="button" class="secondary compact">Copy message</button>
+          </div>
+        </div>
+        <div class="tone-selector" role="group" aria-label="Message tone">
+          <button type="button" class="tone-btn active" data-tone="playful">Playful</button>
+          <button type="button" class="tone-btn" data-tone="formal">Formal</button>
+          <button type="button" class="tone-btn" data-tone="joke">Joke 🎲</button>
+        </div>
+        <textarea id="outreachMessage" rows="8" placeholder="Analyze a profile to generate a message example..."></textarea>
+        <div class="char-counter">
+          <span id="charCount">0</span>/295
+          <span id="charWarning" class="char-warning hidden">Over limit — trim before sending as connection request</span>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Job details</h2>
+        <p class="hint">Fill in the details below to generate a full message with the job info appended.</p>
+        <div class="summary-grid">
+          <label>
+            Job URL
+            <input id="jobUrl" type="url" placeholder="https://www.damiagroup.pt/careers/job/XXXX/" />
+          </label>
+          <label>
+            Budget (gross/year)
+            <input id="jobBudget" type="text" placeholder="Ex.: 65k" />
+          </label>
+          <label>
+            Work model
+            <select id="jobWorkModel">
+              <option value="Remote">Remote</option>
+              <option value="Hybrid" selected>Hybrid</option>
+              <option value="On-site">On-site</option>
+              <option value="Remote / Hybrid">Remote / Hybrid</option>
+            </select>
+          </label>
+        </div>
+        <div class="form-actions" style="margin-top:10px;">
+          <button id="copyFullMessage" type="button">Copy full message</button>
+        </div>
+        <p id="fullMessageStatus" class="status-message" aria-live="polite"></p>
+      </section>
+    </main>
+
+    <script src="popup.js"></script>
+  </body>
+</html>

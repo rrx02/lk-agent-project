@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "LinkedIn Profile Hook Analyzer",
+  "description": "Analyses visible LinkedIn profile details and suggests personalized outreach hooks.",
+  "version": "1.0.0",
+  "permissions": ["tabs", "activeTab", "scripting"],
+  "host_permissions": ["https://*.linkedin.com/*"],
+  "action": {
+    "default_title": "LinkedIn Profile Hook Analyzer",
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://*.linkedin.com/in/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
