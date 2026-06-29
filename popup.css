@@ -75,12 +75,17 @@ label {
 
 input,
 textarea,
-button {
+button,
+select {
   border-radius: 8px;
   border: 1px solid #cbd5e1;
   padding: 8px;
   font: inherit;
   font-size: 0.86rem;
+}
+
+select {
+  background: white;
 }
 
 textarea {
@@ -129,6 +134,11 @@ button.compact {
   margin: 0;
 }
 
+.draft-actions {
+  display: flex;
+  gap: 6px;
+}
+
 .status-message {
   color: #475569;
   font-size: 0.78rem;
@@ -145,20 +155,6 @@ button.compact {
 .hooks {
   display: grid;
   gap: 8px;
-}
-
-.visual-grid {
-  display: grid;
-  gap: 8px;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.visual-preview {
-  background: #e5e7eb;
-  border-radius: 8px;
-  height: 96px;
-  object-fit: cover;
-  width: 100%;
 }
 
 .hook-card {
@@ -189,12 +185,6 @@ button.compact {
   line-height: 1.35;
 }
 
-.hook-card.visual {
-  border-color: #fde68a;
-  background: #fffbeb;
-  color: #92400e;
-}
-
 .empty-state {
   text-align: center;
   color: #6b7280;
@@ -202,6 +192,56 @@ button.compact {
   padding: 10px;
   border: 1px dashed #cbd5e1;
   border-radius: 8px;
+}
+
+.tone-selector {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.tone-btn {
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  border-radius: 20px;
+  color: #475569;
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 5px 13px;
+}
+
+.tone-btn.active {
+  background: #2563eb;
+  border-color: #1d4ed8;
+  color: white;
+}
+
+.tone-btn:hover:not(.active) {
+  background: #e2e8f0;
+  filter: none;
+}
+
+.char-counter {
+  color: #94a3b8;
+  font-size: 0.75rem;
+  margin-top: 5px;
+  text-align: right;
+}
+
+.char-counter.over #charCount {
+  color: #dc2626;
+  font-weight: 700;
+}
+
+.char-counter.over {
+  color: #dc2626;
+}
+
+.char-warning {
+  display: inline;
+  font-size: 0.72rem;
+  margin-left: 6px;
 }
 
 .hidden {
