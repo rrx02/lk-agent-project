@@ -3,102 +3,98 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>LinkedIn Profile Hook Analyzer</title>
+    <title>LK + RF Roles</title>
     <link rel="stylesheet" href="popup.css" />
   </head>
   <body>
     <main class="app">
-      <header class="hero">
-        <p class="eyebrow">LinkedIn hook analysis</p>
-        <h1>Profile Hook Analyzer</h1>
-        <p>Turn profile details into accurate, personalised outreach hooks.</p>
-      </header>
 
-      <section class="card">
-        <h2>Analyze current LinkedIn profile</h2>
-        <p class="hint">Open a LinkedIn profile, click analyze, then choose one hook. The draft rewrites around that hook.</p>
-        <div class="form-actions">
-          <button id="analyzeProfile" type="button">Analyze profile</button>
-          <button id="prefillCurrent" type="button" class="secondary">Use current tab link</button>
-        </div>
-        <p id="analysisStatus" class="status-message" aria-live="polite"></p>
-      </section>
-
-      <section class="card">
-        <h2>Profile summary</h2>
-        <div class="summary-grid">
-          <label>
-            Name
-            <input id="name" type="text" placeholder="Ex.: Ana Silva" />
-          </label>
-          <label>
-            Current title / headline
-            <input id="headline" type="text" placeholder="Ex.: Senior DevOps Engineer at Acme" />
-          </label>
-          <label>
-            LinkedIn URL
-            <input id="linkedinUrl" type="url" placeholder="https://www.linkedin.com/in/..." />
-          </label>
-        </div>
-      </section>
-
-      <section id="hooksCard" class="card hidden">
-        <div class="section-heading">
-          <h2>Conversation hooks</h2>
-          <button id="copyHooks" type="button" class="secondary compact">Copy hooks</button>
-        </div>
-        <div id="hooks" class="hooks"></div>
-      </section>
-
-      <section class="card">
-        <div class="section-heading">
-          <h2>Message draft</h2>
-          <div class="draft-actions">
-            <button id="regenerateMessage" type="button" class="secondary compact">&#8635; Regenerate</button>
-            <button id="copyMessage" type="button" class="secondary compact">Copy message</button>
+      <header class="hero" id="hero">
+        <div class="hero-top">
+          <div>
+            <p class="eyebrow">LinkedIn + RF Roles</p>
+            <h1 id="heroTitle">Profile + Job Message Builder</h1>
+          </div>
+          <div class="brand-switcher" role="group" aria-label="Brand">
+            <button class="brand-btn active" data-brand="damia">Damia</button>
+            <button class="brand-btn" data-brand="meta">META &#129423;</button>
           </div>
         </div>
-        <div class="tone-selector" role="group" aria-label="Message tone">
-          <button type="button" class="tone-btn active" data-tone="playful">Playful</button>
+      </header>
+
+      <!-- 1. CANDIDATE -->
+      <section class="card">
+        <h2>1 — Candidate (LinkedIn)</h2>
+        <div class="form-actions">
+          <button id="analyzeProfile" type="button">Analyze profile</button>
+          <button id="prefillCurrent" type="button" class="secondary">Use current tab</button>
+        </div>
+        <p id="analysisStatus" class="status-message" aria-live="polite"></p>
+        <div id="profilePreview" class="profile-preview hidden">
+          <span id="profileName" class="profile-name"></span>
+          <div id="profileSkills" class="skill-tags"></div>
+        </div>
+      </section>
+
+      <!-- 2. VACANCIES -->
+      <section class="card">
+        <h2>2 — Vacancies</h2>
+        <p class="hint" id="csvHint">Paste the public CSV link for the current brand.</p>
+        <div class="url-row">
+          <input id="csvUrl" type="url" placeholder="https://..." />
+          <button id="loadJobs" type="button" class="secondary compact">Load</button>
+        </div>
+        <p id="loadStatus" class="status-message" aria-live="polite"></p>
+        <select id="jobSelect" class="hidden">
+          <option value="">Select a vacancy...</option>
+        </select>
+        <div id="jobPreview" class="job-preview hidden"></div>
+      </section>
+
+      <!-- 3. MESSAGE SETTINGS -->
+      <section class="card">
+        <h2>3 — Settings</h2>
+        <div class="summary-grid">
+          <label>
+            Agency / team
+            <input id="agencyInput" type="text" placeholder="META, Damia..." />
+          </label>
+          <label>
+            Extra info <span class="optional">(optional)</span>
+            <input id="extraInput" type="text" placeholder="e.g. English B2, banking sector, max 55k" />
+          </label>
+        </div>
+        <div class="lang-row">
+          <span class="setting-label">Language</span>
+          <div class="toggle-group" role="group">
+            <button class="toggle-btn active" data-lang="pt">PT</button>
+            <button class="toggle-btn" data-lang="en">EN</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. MESSAGE -->
+      <section class="card">
+        <div class="section-heading">
+          <h2>4 — Message</h2>
+          <div class="draft-actions">
+            <button id="regenerateMessage" type="button" class="secondary compact">&#8635; Regenerate</button>
+            <button id="copyMessage" type="button" class="secondary compact">Copy</button>
+          </div>
+        </div>
+        <div class="tone-selector" role="group" aria-label="Tone">
+          <button type="button" class="tone-btn" data-tone="playful">Playful</button>
           <button type="button" class="tone-btn" data-tone="formal">Formal</button>
           <button type="button" class="tone-btn" data-tone="joke">Joke &#127922;</button>
         </div>
-        <textarea id="outreachMessage" rows="8" placeholder="Analyze a profile to generate a message..."></textarea>
+        <textarea id="outreachMessage" rows="7" placeholder="Analyze a profile and select a vacancy to generate a message..."></textarea>
         <div class="char-counter">
           <span id="charCount">0</span>/295
           <span id="charWarning" class="char-warning hidden">Over limit — trim before sending as connection request</span>
         </div>
       </section>
 
-      <section class="card">
-        <h2>Job details</h2>
-        <p class="hint">Fill in the details to append job info to the message.</p>
-        <div class="summary-grid">
-          <label>
-            Job URL
-            <input id="jobUrl" type="url" placeholder="https://www.damiagroup.pt/careers/job/XXXX/" />
-          </label>
-          <label>
-            Budget (gross/year)
-            <input id="jobBudget" type="text" placeholder="Ex.: 65k" />
-          </label>
-          <label>
-            Work model
-            <select id="jobWorkModel">
-              <option value="Remote">Remote</option>
-              <option value="Hybrid" selected>Hybrid</option>
-              <option value="On-site">On-site</option>
-              <option value="Remote / Hybrid">Remote / Hybrid</option>
-            </select>
-          </label>
-        </div>
-        <div class="form-actions" style="margin-top:10px;">
-          <button id="copyFullMessage" type="button">Copy full message</button>
-        </div>
-        <p id="fullMessageStatus" class="status-message" aria-live="polite"></p>
-      </section>
     </main>
-
     <script src="popup.js"></script>
   </body>
 </html>
